@@ -7,7 +7,7 @@ import jdk.javadoc.internal.doclets.formats.html.markup.Navigation;
 import java.util.*;
 
 public class GameLogic {
-	public static void main(String[] args){    // test
+	public static void main(String[] args) {    // test
 		PlayersStatus playersStatus = new PlayersStatus();
 		GameSettings gameSettings = new GameSettings(playersStatus);
 		GameLogic gameLogic = new GameLogic();
@@ -22,9 +22,12 @@ public class GameLogic {
 	public static boolean checkRoleSetting(int playerCount, GameSettings gameSettings) {
 		RoleBreakdown roleLimit = new RoleBreakdown();
 		int temp;
-
+		
+		//ToDo 共有者の数が0または2か判定
+		if (
+		
 		//初日占いあり/なしでの分岐
-		if(gameSettings.firstNightSee == 1){
+		if (gameSettings.firstNightSee == 1) {
 			//全員-人狼-1
 			temp = playerCount - roleLimit.werewolvesNum - 1;
 			if(temp > roleLimit.werewolvesNum) {
@@ -41,7 +44,7 @@ public class GameLogic {
 				//全員-人狼-妖狐-1
 				temp = playerCount - roleLimit.werewolvesNum - roleLimit.foxSpiritsNum - 1;
 			}
-			if(temp > roleLimit.werewolvesNum) {
+			if (temp > roleLimit.werewolvesNum) {
 				return true;
 			} else {
 				return false;
@@ -60,7 +63,7 @@ public class GameLogic {
 		playerCount = playersStatus.playerCount();
 
 		while(true){
-			for (int i = 0; i < playerCount - roleLimit.werewolvesNum; i++){
+			for (int i = 0; i < playerCount - roleLimit.werewolvesNum; i++) {
 				int num = rand.nextInt(13);
 				if(num == 0) {
 					roles.add("村人");
