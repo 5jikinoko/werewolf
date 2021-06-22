@@ -29,10 +29,17 @@ public class GameLogic extends VotingAction {
 	 */
 
 	public GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings, NightAction nightAction) {
-		playersStatus = new PlayersStatus();
-		gameSettings = new GameSettings();
-		votingAction = new VotingAction(playersStatus);
-		nightAction = new NightAction(playersStatus, gameSettings.canContinuousGuard);
+		this.playersStatus = new PlayersStatus();
+		this.playersStatus = playersStatus;
+
+		this.gameSettings = new GameSettings();
+		this.gameSettings = gameSettings;
+
+		this.votingAction = new VotingAction(playersStatus);
+		this.votingAction = votingAction;
+		
+		this.nightAction = new NightAction(playersStatus, gameSettings.canContinuousGuard);
+		this.nightAction = nightAction;
 	}
 
 	/**
