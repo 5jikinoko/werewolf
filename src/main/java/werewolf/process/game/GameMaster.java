@@ -1,4 +1,4 @@
-package werewolf.process.game;
+package werewolf.process;
 
 public class GameMaster {
 }

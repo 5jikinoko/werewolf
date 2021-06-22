@@ -2,63 +2,25 @@ package werewolf.store;
 
 import java.util.*;
 
+public class userInfo {
+    public static Map<UUID, nameAndIcon> userInfoMap = new HashMap<UUID, nameAndIcon>();
 
-public class UserProfile {
-    public static Map<UUID, NameAndIcon> userProfileMap = new HashMap<UUID, NameAndIcon>();
-
-    public static UUID newUser(String userName, int userIcon) {
+    public UUID newUser(String name, int icon) {
         UUID newUUID = UUID.randomUUID();
-        userProfileMap.put(newUUID, new NameAndIcon(userName, userIcon));
+        userInfoMap.put(newUUID, new nameAndIcon(name, icon));
         return newUUID;
     }
 
-    public static UUID newUser(NameAndIcon nameAndIcon) {
-        UUID newUUID = UUID.randomUUID();
-        userProfileMap.put(newUUID, nameAndIcon);
-        return newUUID;
-    }
+    
 
-    public static boolean changeProfile(UUID userUUID, String userName, int userIcon) {
-        NameAndIcon nameAndIcon = userProfileMap.get(userUUID);
+    public class nameAndIcon {
+        public String name;
+        public int icon;
 
-        if (nameAndIcon != null) {
-            nameAndIcon.name = userName;
-            nameAndIcon.icon = userIcon;
-            return true;
-        } else {
-            return false;
+        nameAndIcon(String name, int icon) {
+            this.name = name;
+            this.icon = icon;
         }
     }
-
-    public static boolean changeProfile(UUID userUUID, NameAndIcon nameAndIcon) {
-        NameAndIcon oldNameAndIcon = userProfileMap.get(userUUID);
-
-        if (oldNameAndIcon != null) {
-            userProfileMap.put(userUUID, nameAndIcon);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static NameAndIcon getUserNameAndIcon(UUID userUUID) {
-        return userProfileMap.get(userUUID);
-    }
-
-    public static String getUserName(UUID userUUID) {
-        NameAndIcon nameAndIcon = userProfileMap.get(userUUID);
-        if (nameAndIcon != null) {
-            return nameAndIcon.name;
-        } else {
-            return null;
-        }
-    }
-
-
-
-
-
-
-
 
 }
