@@ -53,7 +53,7 @@ public class Main {
                         wsCtx.send(message);
                     }
                 }
-                System.out.println("connect");
+                System.out.println("connected");
             });
             ws.onMessage(ctx -> {
                 System.out.println(ctx.message());
