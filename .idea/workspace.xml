@@ -5,26 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c60d36c7-24c0-4cec-81bf-5bdb736c7dd3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/ChatStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/MessageForSending.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/NameAndIcon.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/RoomInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/UserProfile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/chat/Message.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/gamesettings/GameSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/GameLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/GameLogic.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/GameMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/GameMaster.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/asset-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/css/main.c8342f5d.chunk.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/css/main.c8342f5d.chunk.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/2.b922c43e.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/2.b922c43e.chunk.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/2.b922c43e.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/main.150f498b.chunk.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/main.150f498b.chunk.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/runtime-main.6e96b6df.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/static/js/runtime-main.6e96b6df.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/test.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/NightAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/NightAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/PlayerStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/PlayerStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/PlayersStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/PlayersStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/process/game/VotingAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/process/game/VotingAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/store/ChatStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/ChatStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/store/MessageForSending.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/MessageForSending.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/store/NameAndIcon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/NameAndIcon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/store/RoomInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/RoomInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/werewolf/store/UserProfile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/werewolf/store/UserProfile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/public/asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/asset-manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/public/static/css/main.c8342f5d.chunk.css" beforeDir="false" />
@@ -36,10 +30,7 @@
       <change beforePath="$PROJECT_DIR$/target/classes/public/static/js/main.150f498b.chunk.js.map" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/public/static/js/runtime-main.6e96b6df.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/public/static/js/runtime-main.6e96b6df.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/test.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/werewolf/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/werewolf/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/testJavalin-1.0-SNAPSHOT-shaded.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/testJavalin-1.0-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/werewolf/Main.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

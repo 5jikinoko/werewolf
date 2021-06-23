@@ -1,2 +1,4 @@
-package werewolf.store;public class MessageForSending {
+package werewolf.store;
+
+public class MessageForSending {
 }

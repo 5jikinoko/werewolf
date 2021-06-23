@@ -9,38 +9,39 @@
 * 進捗：
 * getWerewolfPlayerUUIDsメソッドにおいてListに追加する順番は大切なのか？
 */
+
+package werewolf.process.game;
+
 import java.util.*;
 
+public class PlayersStatus {
+  private Map<UUID, PlayerStatus>;
 
-
-class PlayersStatus　{
-  private Map<UUID,　PlayerStatus>;
-
-  void setPlayers　(List<UUID> userUUIDs)　{
+  void setPlayers (List<UUID> userUUIDs) {
     /*
     * メソッドの機能概要：Mapに引数で受け取ったUUIDをkeyにしてエントリーを追加していく。
     *                  valueはPlayerStatusのインスタンスを生成して入れる。
     */
-    for (int i　=　0;　i　<　userUUIDs.size();　i++)　{
+    for (int i = 0; i < userUUIDs.size(); i++) {
       PlayerStatus PS = new PlayerStatus();
-      Map.put(userUUIDs.get(i),　PS);
+      Map.put(userUUIDs.get(i), PS);
     }
   }
 
-  void setRoles　(List<String> roles)　{
+  void setRoles (List<String> roles) {
     /*
     * メソッドの機能概要：役職を設定。
     *                 受け取ったRoleのリストの要素をそれぞれMapのvalueであるPlayerStatusのインスタンスのroleフィールドに順に代入していく.
     *                 aliveフィールドにはtrueを代入していく。
     */
-    for (int i　=　0;　i　<　roles.size();　i++)　{
+    for (int i = 0; i < roles.size(); i++) {
       PlayerStatus PS = new PlayerStatus();
       PS.role = roles.get(i);
       PS.alive = true;
     }
   }
 
-  String getRole　(UUID userUUID)　{
+  String getRole (UUID userUUID){
     //メソッドの機能概要：ユーザUUIDが指すプレイヤーの役職を返す。
     //エラー処理：UUIDが存在しないなら戻り値roleは"error"
     int keyCounter = 0;
