@@ -2,7 +2,7 @@ package werewolf.store;
 
 import java.util.*;
 
-public class userInfo {
+public class UserProfile {
     public static Map<UUID, nameAndIcon> userInfoMap = new HashMap<UUID, nameAndIcon>();
 
     public UUID newUser(String name, int icon) {

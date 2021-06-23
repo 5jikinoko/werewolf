@@ -5,17 +5,17 @@
  * @author al19100
  */
 
+package werewolf.process.game;
+
 import java.util.Random;
-
-import org.graalvm.compiler.nodes.PiArrayNode.Placeholder;
-
-import jdk.javadoc.internal.doclets.formats.html.markup.Navigation;
 
 import java.util.*;
 
-public class GameLogic extends VotingAction {
+import werewolf.store.gamesettings.GameSettings;
 
-	PlayerStatus playersStatus;
+public class GameLogic {
+
+	PlayersStatus playersStatus;
 	VotingAction votingAction;
 	GameSettings gameSettings;
 	NightAction nightAction;
@@ -24,21 +24,17 @@ public class GameLogic extends VotingAction {
 	 * コンストラクタ
 	 * @param playersStatus  ゲーム時のユーザの生死と役職の情報
 	 * @param votingAction 投票について
-	 * @param gaemSettings ゲームの設定情報
+	 * @param gameSettings ゲームの設定情報
 	 * @param nightAction 夜のアクション
 	 */
 
-	public GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings, NightAction nightAction) {
-		this.playersStatus = new PlayersStatus();
+	GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings, NightAction nightAction) {
 		this.playersStatus = playersStatus;
 
-		this.gameSettings = new GameSettings();
 		this.gameSettings = gameSettings;
 
-		this.votingAction = new VotingAction(playersStatus);
 		this.votingAction = votingAction;
-		
-		this.nightAction = new NightAction(playersStatus, gameSettings.canContinuousGuard);
+
 		this.nightAction = nightAction;
 	}
 

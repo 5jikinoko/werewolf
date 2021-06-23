@@ -1,2 +1,3 @@
-package werewolf.store;public class RoomInfo {
+package werewolf.store;
+public class RoomInfo {
 }

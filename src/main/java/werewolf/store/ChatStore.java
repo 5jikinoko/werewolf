@@ -1,4 +1,4 @@
 package werewolf.store;
 
-public class ChatStoew {
+public class ChatStore {
 }

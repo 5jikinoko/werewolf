@@ -1,3 +1,5 @@
+package werewolf.process.game;
+
 import java.util.*;
 //ゲームのロジックを持ち実行する。
 public class VotingAction {

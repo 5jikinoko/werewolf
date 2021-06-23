@@ -6,9 +6,11 @@
  * auther al19013
  */
 
-
+package werewolf.process.game;
 
 import java.util.*;
+
+import werewolf.store.chat.Message;
 
 public class NightAction{
     PlayersStatus playersStatus;            //プレイヤーの生死状況、役職
@@ -59,7 +61,7 @@ public class NightAction{
     }
 
     public Message guardAction(UUID userUUID,UUID targetUserUUID){ //騎士行動処理
-        Messaage message = new Message();
+        Message message = new Message();
         message.text = "護衛した";
         if(targetUserUUID == null && !continuousGuard){
             List<UUID> guardList = new ArrayList<UUID>();

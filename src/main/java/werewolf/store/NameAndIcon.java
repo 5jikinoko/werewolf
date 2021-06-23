@@ -1,2 +1,4 @@
-package werewolf.store;public class nameAndIcon {
+package werewolf.store;
+
+public class NameAndIcon {
 }
