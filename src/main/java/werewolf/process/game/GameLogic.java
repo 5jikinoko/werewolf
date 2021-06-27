@@ -1,7 +1,7 @@
 /**
  * ゲームのロジックを持ち、実行する
  *
- * @version 1.1
+ * @version 1.2
  * @author al19100
  */
 
@@ -11,9 +11,18 @@ import java.util.Random;
 
 import java.util.*;
 
+import werewolf.store.gamesettings.PlayersStatus;
+
+import werewolf.store.gamesettings.VotingAction;
+
 import werewolf.store.gamesettings.GameSettings;
 
+import werewolf.store.gamesettings.NightAction;
+
 public class GameLogic {
+	public static void main(String[] args){
+
+	}
 
 	PlayersStatus playersStatus;
 	VotingAction votingAction;
@@ -55,7 +64,7 @@ public class GameLogic {
 		}
 
 		//初日占いあり/なしでの分岐
-		if (firstNightSee == 1 || firstNightSee == 2) {
+		if (firstNightSee == 0 || firstNightSee == 2) {
 			//全員-人狼-1
 			temp = playerCount - roleLimit.werewolvesNum - 1;
 			if (temp > roleLimit.werewolvesNum) {
@@ -66,8 +75,8 @@ public class GameLogic {
 		} else {
 			//妖狐>=占いまたは妖狐<占い
 			if (roleLimit.foxSpiritsNum >= roleLimit.seersNum) {
-				//全員-人狼-(妖狐-占い)-1
-				temp = playerCount - roleLimit.werewolvesNum - (roleLimit.foxSpiritsNum - roleLimit.seersNum) - 1;
+				//全員-人狼-占い-1
+				temp = playerCount - roleLimit.werewolvesNum - roleLimit.seersNum - 1;
 			} else {
 				//全員-人狼-妖狐-1
 				temp = playerCount - roleLimit.werewolvesNum - roleLimit.foxSpiritsNum - 1;
@@ -91,7 +100,9 @@ public class GameLogic {
 	public void distributeRole(int playerCount, RoleBreakdown roleLimit) {
 		List<String> roles = new ArrayList<>();
 		int[] temp = new int[13];
+		int [] werewolfSelect = new int[roleLimit.werewolvesNum];
 		Random rand = new Random();
+		int firstNightSee = gameSettings.firstNightSee;
 
 		while(true){
 			for (int i = 0; i < 13; i++) {
@@ -99,7 +110,7 @@ public class GameLogic {
 			}
 
 			// 人狼以外を振り分け
-			for (int i = 0; i < playerCount - roleLimit.werewolvesNum; i++) {
+			for (int i = 0; i < playerCount; i++) {
 				int num = rand.nextInt(13);
 				if (num == 0 && roleLimit.villagersNum != temp[0]) {
 					roles.add("villager");
@@ -128,7 +139,7 @@ public class GameLogic {
 				} else if (num == 8 && roleLimit.madmenNum != temp[8]) {
 					roles.add("madmen");
 					temp[8]++;
-				} else if (num == 9 && roleLimit.traitorsMum !=  temp[9]) {
+				} else if (num == 9 && roleLimit.traitorsNum !=  temp[9]) {
 					roles.add("traitor");
 					temp[9]++;
 				} else if (num == 10 && roleLimit.foxSpiritsNum != temp[10]) {
@@ -146,20 +157,36 @@ public class GameLogic {
 				}
 			}
 
-			// 人狼を振り分け
+			// 人狼を何番目に入れるか決める
 			for (int i = 0; i < roleLimit.werewolvesNum; i++) {
-				int num = rand.nextInt(playerCount - roleLimit.werewolvesNum + i);
-				roles.add(num, "werewolve");
+				int num = rand.nextInt(playerCount - roleLimit.werewolvesNum);
+				for (int j = 0; j < roleLimit.werewolvesNum; j++) {
+					if (num == werewolfSelect[j]) {
+						// 既に同一numが存在していたとき
+						// numの再振り分け
+						i--;
+						break;
+					} else if (j == roleLimit.werewolvesNum - 1) {
+						// 最後までforを回し、同一numが存在していなかったとき
+						werewolfSelect[i] = num;
+					}
+				}
+			}
+
+			// werewolfSelect[i]番目をwerewolveに書き換え
+			for (int i = 0; i < roleLimit.werewolvesNum; i++){
+				roles.set(werewolfSelect[i], "werewolve");
 			}
 
 			// 振り分けに問題がないかチェック
-			if (GameLogic.checkRoleSetting(playerCount, gameSettings) == true) {
+			if (GameLogic.checkRoleSetting(playerCount, firstNightSee, roleLimit) == true) {
 				playersStatus.setRoles(roles);
 				break;
 			}
 			// 問題があれば再振り分け
 		}
 	}
+
 
 	/**
 	 * @param userUUID 夜のアクションをするプレイヤー
@@ -177,6 +204,7 @@ public class GameLogic {
 
 		role = playersStatus.getRole(userUUID);
 
+		// 役職ごとのアクション
 		if (role.equals("seer")) {
 			message = nightAction.seerAction(userUUID, targetUUID);
 		} else if (role.equals("necromancer")) {
@@ -199,10 +227,10 @@ public class GameLogic {
 	}
 
 	/**
-	 * @return nightActionクラスのfinishNightPhaseメソッドを返す
+	 * @return nightActionクラスのfinishNightActionメソッドを返す
 	 */
 	public List<UUID> finishNightPhase() {
-		return nightAction.finishNightPhase;
+		return nightAction.finishNightAction();
 	}
 
 	/**
@@ -217,16 +245,16 @@ public class GameLogic {
 		int villagers, werewolves, foxSpirits;
 
 		// 陣営ごとの生存人数
-		villagers = playersStatus.survivingVillagersTeamSize;
-		werewolves = playersStatus.survivingWerewolvesTeamSize;
-		foxSpirits = playersStatus.survivingFoxSpiritsTeamSize;
+		villagers = playersStatus.survivingVillagersTeamSize();
+		werewolves = playersStatus.survivingWerewolvesTeamSize();
+		foxSpirits = playersStatus.survivingFoxSpiritsTeamSize();
 
 		if (villagers == werewolves) {
 			if (foxSpirits != 0) {
 				return 3;
 			}
 			return 1;
-		} else if (foxSpirits == 0 && werewolves == 0) {
+		} else if (werewolves == 0) {
 			if (foxSpirits != 0) {
 				return 3;
 			}
