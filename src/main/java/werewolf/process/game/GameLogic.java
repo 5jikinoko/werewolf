@@ -37,14 +37,14 @@ public class GameLogic {
 	 * @param nightAction 夜のアクション
 	 */
 
-	GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings, NightAction nightAction) {
+	GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings) {
 		this.playersStatus = playersStatus;
 
 		this.gameSettings = gameSettings;
 
 		this.votingAction = votingAction;
 
-		this.nightAction = nightAction;
+		this.nightAction = new NightAction(playersStatus, gameSettings.canContinuousGuard);
 	}
 
 	/**
