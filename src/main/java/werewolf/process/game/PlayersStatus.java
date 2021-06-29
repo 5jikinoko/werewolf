@@ -9,87 +9,67 @@
 * 進捗：
 * getWerewolfPlayerUUIDsメソッドにおいてListに追加する順番は大切なのか？
 */
-
 package werewolf.process.game;
 
 import java.util.*;
 
-public class PlayersStatus {
-  private Map<UUID, PlayerStatus>;
 
-  void setPlayers (List<UUID> userUUIDs) {
+class PlayersStatus{
+  private Map<UUID,PlayerStatus> statusMap = new HashMap<UUID,PlayerStatus>();
+
+  void setPlayers(List<UUID> userUUIDs) {
     /*
     * メソッドの機能概要：Mapに引数で受け取ったUUIDをkeyにしてエントリーを追加していく。
     *                  valueはPlayerStatusのインスタンスを生成して入れる。
     */
-    for (int i = 0; i < userUUIDs.size(); i++) {
+    for (int i=0;i<userUUIDs.size();i++)  {
       PlayerStatus PS = new PlayerStatus();
-      Map.put(userUUIDs.get(i), PS);
+      statusMap.put(userUUIDs.get(i),PS);
     }
   }
 
-  void setRoles (List<String> roles) {
+  void setRoles(List<String> roles) {
     /*
     * メソッドの機能概要：役職を設定。
     *                 受け取ったRoleのリストの要素をそれぞれMapのvalueであるPlayerStatusのインスタンスのroleフィールドに順に代入していく.
     *                 aliveフィールドにはtrueを代入していく。
     */
-    for (int i = 0; i < roles.size(); i++) {
+    int i = 0;
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
       PlayerStatus PS = new PlayerStatus();
       PS.role = roles.get(i);
       PS.alive = true;
+      entry.setValue(PS);
+      i++;
     }
   }
 
-  String getRole (UUID userUUID){
+  String getRole(UUID userUUID) {
     //メソッドの機能概要：ユーザUUIDが指すプレイヤーの役職を返す。
     //エラー処理：UUIDが存在しないなら戻り値roleは"error"
-    int keyCounter = 0;
-    int keyCounter2 = 0;
-
-    for(UUID key : Map.keySet()) {
-      keyCounter++;
-    }
-
-    for(UUID key : Map.keySet()) {
-      if(key.equals(userUUID)) {
-        return Map.get(userUUID).role;
-        break;
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if(entry.getKey() == userUUID) {
+        return entry.getValue().role;
       }
-      keyCounter2++;
     }
-    if(keyCounter == keyCounter2) {
-      return "error";
-    }
-
-    return role;
+    return "error";
   }
 
-  void changeRole (UUID userUUID,String role) {
+  void changeRole(UUID userUUID,String role) {
     //メソッドの機能概要：ユーザUUIDが指すプレイヤーの役職を変更。
-    Map.get(userUUID).role = role;
+    statusMap.get(userUUID).role = role;
   }
 
-  boolean isAlive (UUID userUUID) {
+  boolean isAlive(UUID userUUID)  {
     //メソッドの機能概要：ユーザUUIDが指すプレイヤーが生存しているか返す(aliveの値を返す)。
     //エラー処理：UUIDが存在しないなら戻り値はfalse
     //生存：true,死亡：false
-    int keyCounter = 0;
-    int keyCounter2 = 0;
-    for(UUID key : Map.keySet()) {
-      keyCounter++;
-    }
-
-    for(UUID key : Map.keySet()) {
-      if(key.equals(userUUID)) {
-        return Map.get(userUUID).alive;
-        break;
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if(entry.getKey() == userUUID) {
+        return entry.getValue().alive;
       }
-      keyCounter2++;
     }
-    if(keyCounter == keyCounter2) {
-      return false;
-    }
+    return false;
   }
 
   /*
@@ -97,11 +77,7 @@ public class PlayersStatus {
   */
   int playerCount () {
     //メソッドの機能概要：プレイヤーの人数を返す。
-    int numberofPlayer = 0;
-    for (UUID key : Map.keySet()) {
-      numberofPlayer++;
-    }
-    return numberofPlayer;
+    return statusMap.size();
   }
 
   /*
@@ -110,15 +86,15 @@ public class PlayersStatus {
   int survivingVillagersTeamSize () {
     //メソッドの機能概要：生きている村人陣営の人数を返す
     int numberofSurvivingVillager = 0;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("villager") || Map.get(key).role.equals("seer") ||
-            Map.get(key).role.equals("necromancer") || Map.get(key).role.equals("knight") ||
-              Map.get(key).role.equals("hunter") || Map.get(key).role.equals("brackKnight") ||
-                Map.get(key).role.equals("freemasonary") || Map.get(key).role.equals("baker")) {
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("villager") || entry.getValue().role.equals("seer") ||
+            entry.getValue().role.equals("necromancer") || entry.getValue().role.equals("knight") ||
+              entry.getValue().role.equals("hunter") || entry.getValue().role.equals("brackKnight") ||
+                entry.getValue().role.equals("freemasonary") || entry.getValue().role.equals("baker")) {
 
-        if(Map.get(key).alive == true) {
-          numberofSurvivingVillager++;
-        }
+                  if(entry.getValue().alive == true) {
+                    numberofSurvivingVillager++;
+                  }
       }
     }
     return numberofSurvivingVillager;
@@ -130,12 +106,13 @@ public class PlayersStatus {
   int survivingWerewolvesTeamSize () {
     //機能概要：生きている人狼陣営の人数を返す。
     int numberofSurvivingWerewolf = 0;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("werewolf") || Map.get(key).role.equals("madman") ||
-          Map.get(key).role.equals("traitor")) {
-            if(Map.get(key).alive == true) {
-              numberofSurvivingWerewolf++;
-            }
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("werewolf") || entry.getValue().role.equals("madman") ||
+            entry.getValue().role.equals("traitor")) {
+
+              if(entry.getValue().alive == true) {
+                numberofSurvivingWerewolf++;
+              }
       }
     }
     return numberofSurvivingWerewolf;
@@ -147,9 +124,10 @@ public class PlayersStatus {
   int survivingFoxSpiritsTeamSize () {
     //メソッドの機能概要：生きている妖狐陣営の人数を返す。
     int numberofSurvivingFoxSpirit = 0;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("foxSpirit")) {
-        if(Map.get(key).alive == true) {
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("foxSpirit")) {
+        
+        if(entry.getValue().alive == true) {
           numberofSurvivingFoxSpirit++;
         }
       }
@@ -163,9 +141,10 @@ public class PlayersStatus {
   int survivingFoolsTeamSize () {
     //メソッドの機能概要：生きている吊人陣営の人数を返す。
     int numberofSurvivingFool = 0;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("fool") || Map.get(key).role.equals("phantomThief")) {
-        if(Map.get(key).alive == true) {
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("fool") || entry.getValue().role.equals("phantomThief")) {
+        
+        if(entry.getValue().alive == true) {
           numberofSurvivingFool++;
         }
       }
@@ -179,9 +158,10 @@ public class PlayersStatus {
   boolean isSurvivingBaker () {
     //機能概要：パン屋の生き残りがいるか調べ、生き残りがいるならtrueを返す。
     int numberofSurvivingBaker = 0;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("baker")) {
-        if(Map.get(key).alive == true) {
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("baker")) {
+        
+        if(entry.getValue().alive == true) {
         numberofSurvivingBaker++;
         }
       }
@@ -200,12 +180,10 @@ public class PlayersStatus {
   */
   List<UUID> getWerewolfPlayerUUIDs () {
     //機能概要：人狼プレイヤー全員分のUUIDを返す。
-    int　numberofWerewolf = 0;
     List<UUID> WerewolfPlayerUUIDs = new ArrayList<UUID> () ;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("werewolf")) {
-        WerewolfPlayerUUIDs.add(numberofWerewolf, key) ;
-        numberofWerewolf++;
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().role.equals("werewolf")) {
+        WerewolfPlayerUUIDs.add(entry.getKey()) ;
       }
     }
     return WerewolfPlayerUUIDs;
@@ -217,12 +195,10 @@ public class PlayersStatus {
   */
   List<UUID> getDeadPlayerUUIDs () {
     //機能概要：死亡しているプレイヤー全員分のUUIDを返す。
-    int numberofDeadPlayer = 0;
     List<UUID> DeadPlayerUUIDs = new ArrayList<UUID> () ;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).alive == false) {
-        DeadPlayerUUIDs.add(numberofDeadPlayer, key);
-        numberofDeadPlayer++;
+    for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
+      if (entry.getValue().alive == false) {
+        DeadPlayerUUIDs.add(entry.getKey());
       }
     }
     return DeadPlayerUUIDs;
@@ -236,10 +212,13 @@ public class PlayersStatus {
     * ＊このメソッドの実行前にgetRoleを呼び、
     * 引数のUUIDが指すプレイヤーの役職が共有者なら実行すること。
     */
-    UUID freemasonaryUUID;
-    for (UUID key : Map.keySet()) {
-      if (Map.get(key).role.equals("freemasonary") && !(key.equals(userUUID))) {
-        freemasonaryUUID = key;
+    if(!getRole(userUUID).equals("freemasonary")){
+      return null;
+    }
+    UUID freemasonaryUUID = null;
+    for (Map.Entry<UUID, PlayerStatus> entry :  statusMap.entrySet()) {
+      if(entry.getKey() != userUUID && entry.getValue().role.equals("freemasonary")){
+        break;
       }
     }
     return freemasonaryUUID;
@@ -264,19 +243,18 @@ public class PlayersStatus {
     int checkListCounter = 0;
     int mapCounter = 0;
     //Mapに格納されている要素数を求める
-    for (UUID key : Map.keySet()) {
+    for (UUID key : statusMap.keySet()) {
       keyCounter++;
     }
     //Listに格納されている要素数を求める
     for(UUID s : notSelectedPlayers){
       listCounter++;
     }
-
     //Mapから取り出したkeyとList内のUUIDが一致しなくなるまでwhile
     Outer:
     while(1) {
       //Randomクラスのオブジェクトを生成
-      Random　random = new Random ();
+      Random  random = new Random ();
       //整数の変数randomValueに0~keyCounterのランダムな数字を代入
       int randomValue = random.nextInt(keyCounter);
 
@@ -285,9 +263,9 @@ public class PlayersStatus {
       checkListCounter = 0;
 
       //Mapをfor文で回していき、randomValueの値になった時のkeyを取り出す
-      for(String key : Map.keySet()) {
+      for(Map.Entry<UUID, PlayerStatus> entry :  statusMap.entrySet()) {
         if(mapCounter == randomValue) {
-          choisedUUID = key;
+          choisedUUID = entry.getKey();
           break;
         }
         mapCounter++;
@@ -322,47 +300,47 @@ public class PlayersStatus {
     * その役職のプレイヤーの合計人数(生死は問わない)を入れて返す。
     */
     RoleBreakdown eachRoleNum = new RoleBreakdown ();
-    for (UUID key : Map.keySet()) {
-      if(Map.get(key).role.equals("villager")) {
+    for(Map.Entry<UUID, PlayerStatus> entry :  statusMap.entrySet()) {
+      if(entry.getValue().role.equals("villager")) {
         eachRoleNum.villagersNum++;
       }
-      else if(Map.get(key).role.equals("seer")) {
+      else if(entry.getValue().role.equals("seer")) {
         eachRoleNum.seersNum++;
       }
-      else if(Map.get(key).role.equals("necromancer")) {
+      else if(entry.getValue().role.equals("necromancer")) {
         eachRoleNum.necromancersNum++;
       }
-      else if(Map.get(key).role.equals("knight")) {
+      else if(entry.getValue().role.equals("knight")) {
         eachRoleNum.knightsNum++;
       }
-      else if(Map.get(key).role.equals("hunter")) {
+      else if(entry.getValue().role.equals("hunter")) {
         eachRoleNum.huntersNum++;
       }
-      else if(Map.get(key).role.equals("brackKnight")) {
+      else if(entry.getValue().role.equals("brackKnight")) {
         eachRoleNum.brackKnightsNum++;
       }
-      else if(Map.get(key).role.equals("freemasonary")) {
+      else if(entry.getValue().role.equals("freemasonary")) {
         eachRoleNum.freemasonariesNum++;
       }
-      else if(Map.get(key).role.equals("baker")) {
+      else if(entry.getValue().role.equals("baker")) {
         eachRoleNum.bakersNum++;
       }
-      else if(Map.get(key).role.equals("werewolf")) {
+      else if(entry.getValue().role.equals("werewolf")) {
         eachRoleNum.werewlovesNum++;
       }
-      else if(Map.get(key).role.equals("madman")) {
+      else if(entry.getValue().role.equals("madman")) {
         eachRoleNum.madmenNum++;
       }
-      else if(Map.get(key).role.equals("traitor")) {
+      else if(entry.getValue().role.equals("traitor")) {
         eachRoleNum.traitorsNum++;
       }
-      else if(Map.get(key).role.equals("foxSpirit")) {
+      else if(entry.getValue().role.equals("foxSpirit")) {
         eachRoleNum.foxSpiritsNum++;
       }
-      else if(Map.get(key).role.equals("fool")) {
+      else if(entry.getValue().role.equals("fool")) {
         eachRoleNum.foolsNum++;
       }
-      else if(Map.get(key).role.equals("phantomThief")) {
+      else if(entry.getValue().role.equals("phantomThief")) {
         eachRoleNum.phantomThievesNum++;
       }
     }
@@ -370,6 +348,6 @@ public class PlayersStatus {
   }
 
   void kill (UUID userUUID) {
-    Map.get(userUUID).alive = false;
+    statusMap.get(userUUID).alive = false;
   }
 }
