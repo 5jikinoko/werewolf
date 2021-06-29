@@ -5,12 +5,9 @@
  * last update date 2021/06/19
  * auther al19013
  */
-
 package werewolf.process.game;
 
 import java.util.*;
-
-import werewolf.store.chat.Message;
 
 public class NightAction{
     PlayersStatus playersStatus;            //プレイヤーの生死状況、役職
@@ -38,9 +35,9 @@ public class NightAction{
             targetUUID = playersStatus.getRandomUser(seerList);
         }
         message.userUUID = targetUUID;
-        if(playersStatus.role.equals("werewolf") || playersStatus.role.equals("blackKnight")){
+        if(playersStatus.getRole(targetUUID).equals("werewolf") || playersStatus.getRole(targetUUID).equals("blackKnight")){
             message.text = "人狼だった";
-        }else if(playersStatus.role.equals("foxSpirit")){
+        }else if(playersStatus.getRole(targetUUID).equals("foxSpirit")){
             tonightVictim.add(targetUUID);
             message.text = "人狼でなかった";
         }else{
@@ -52,7 +49,7 @@ public class NightAction{
     public Message necromancerAction(UUID userUUID,UUID targetUUID){ //霊媒師行動処理
         Message message = new Message();
         message.userUUID = targetUUID;
-        if(playersStatus.role.equals("werewolf")){
+        if(playersStatus.getRole(targetUUID).equals("werewolf")){
             message.text = "人狼だった";
         }else{ //その他
             message.text = "人狼でなかった";
@@ -61,12 +58,14 @@ public class NightAction{
     }
 
     public Message guardAction(UUID userUUID,UUID targetUserUUID){ //騎士行動処理
-        Message message = new Message();
+        Messaage message = new Message();
         message.text = "護衛した";
         if(targetUserUUID == null && !continuousGuard){
             List<UUID> guardList = new ArrayList<UUID>();
             guardList = playersStatus.getDeadPlayerUUIDs(); 
-            guardList.add(lastNightGuardTarget.getKey());
+            for (Map.Entry<UUID,UUID>   entry : lastNightGuardTarget.entrySet()){
+            guardList.add(entry.getKey());
+            }
             targetUserUUID = playersStatus.getRandomUser(guardList);
         }
 
@@ -88,7 +87,7 @@ public class NightAction{
         Message message = new Message();
         message.text = "襲撃を試みた";
         
-        if(playersStatus.getWerewolfPlayerUUIDs.contains(targetUserUUID)){
+        if(playersStatus.getWerewolfPlayerUUIDs().contains(targetUserUUID)){
             message.text = "エラー:人狼を襲撃できない";
             return message;
         }
@@ -113,15 +112,17 @@ public class NightAction{
     public Message phantomThiefAction(UUID userUUID,UUID targetUserUUID){ //怪盗行動処理
         Messsage message = new Message();
 
-        if(targetUserUUID == null){
-            targetUserUUID = playersStatus.getRandomUser(userUUID);
+        if(targetUserUUID == null){  
+            List<UUID> userUUID_ = new ArrayList<UUID>();
+            userUUID_.add(userUUID);
+            targetUserUUID = playersStatus.getRandomUser(userUUID_);
         }
         message.userUUID = targetUserUUID;
         message.text = playersStatus.getRole(targetUserUUID) + "を奪った";
         playersStatus.changeRole(userUUID,playersStatus.getRole(targetUserUUID));
         playersStatus.changeRole(targetUserUUID,"phantomThief");
-        if(playersStatus.role.equals("werewolf") || playersStatus.role.equals("traitor") ){
-            tonightVictiom.add(targetUserUUID);
+        if(playersStatus.getRole(targetUserUUID).equals("werewolf") || playersStatus.getRole(targetUserUUID).equals("traitor") ){
+            tonightVictim.add(targetUserUUID);
         }
         return message;
     }
@@ -153,3 +154,4 @@ public class NightAction{
         return result;
     }
 }
+
