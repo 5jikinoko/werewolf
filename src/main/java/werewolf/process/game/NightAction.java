@@ -10,14 +10,24 @@ package werewolf.process.game;
 import java.util.*;
 
 public class NightAction{
-    PlayersStatus playersStatus;            //プレイヤーの生死状況、役職
-    List<UUID> tonightVictim;               //今夜の犠牲者一覧
-    Map<UUID,Integer> killNominee;          //人狼の襲撃候補者
-    Map<UUID,UUID> guardTarget;             //騎士の守り先
-    Map<UUID,UUID> lastNightGuardTarget;    //昨夜の騎士の守り先
-    boolean continuousGuard;                //連続ガードの有無
+    /**
+    *役職ごとの夜のアクションを遂行する
+    *@param playersStatus プレイヤーの生死状況、役職
+    *@param tonightVictim 今夜の犠牲者のリスト
+    *@param killNominee 人狼襲撃候補者
+    *@param guardTarget 騎士の守り先
+    *@param lastNightGuardTarget 昨夜の騎士の守り先
+    *@param continuousGuard 連続ガードの有無
+    */
+    PlayersStatus playersStatus;
+    List<UUID> tonightVictim;
+    Map<UUID,Integer> killNominee;
+    Map<UUID,UUID> guardTarget;
+    Map<UUID,UUID> lastNightGuardTarget;
+    boolean continuousGuard;
 
-    public NightAction(PlayersStatus playersStatus,boolean continuousGuard){ //コンストラクタ
+    //コンストラクタ
+    public NightAction(PlayersStatus playersStatus,boolean continuousGuard){
         this.playersStatus = playersStatus;
         this.continuousGuard = continuousGuard;
         tonightVictim = new ArrayList<UUID>();
@@ -26,7 +36,8 @@ public class NightAction{
         lastNightGuardTarget  = new HashMap<UUID,UUID>(); 
     }
 
-    public Message seerAction(UUID userUUID,UUID targetUUID){ //占い師行動処理
+    //占い師行動処理
+    public Message seerAction(UUID userUUID,UUID targetUUID){
         Message message = new Message();
         if(targetUUID == null){
             List<UUID> seerList = new ArrayList<UUID>();
@@ -46,18 +57,20 @@ public class NightAction{
         return message;
     }
 
-    public Message necromancerAction(UUID userUUID,UUID targetUUID){ //霊媒師行動処理
+    //霊媒師行動処理
+    public Message necromancerAction(UUID userUUID,UUID targetUUID){
         Message message = new Message();
         message.userUUID = targetUUID;
         if(playersStatus.getRole(targetUUID).equals("werewolf")){
             message.text = "人狼だった";
-        }else{ //その他
+        }else{
             message.text = "人狼でなかった";
         }
         return message;
     }
 
-    public Message guardAction(UUID userUUID,UUID targetUserUUID){ //騎士行動処理
+    //騎士行動処理
+    public Message guardAction(UUID userUUID,UUID targetUserUUID){
         Messaage message = new Message();
         message.text = "護衛した";
         if(targetUserUUID == null && !continuousGuard){
@@ -82,7 +95,8 @@ public class NightAction{
         return message;
     }
 
-    public Message werewolfAction(UUID userUUID,UUID targetUserUUID,int priority){ //人狼行動処理
+    //人狼行動処理
+    public Message werewolfAction(UUID userUUID,UUID targetUserUUID,int priority){
         List<UUID> werewolfList = new ArrayList<UUID>();
         Message message = new Message();
         message.text = "襲撃を試みた";
@@ -109,7 +123,8 @@ public class NightAction{
         return message;
     }
 
-    public Message phantomThiefAction(UUID userUUID,UUID targetUserUUID){ //怪盗行動処理
+    //怪盗行動処理
+    public Message phantomThiefAction(UUID userUUID,UUID targetUserUUID){
         Messsage message = new Message();
 
         if(targetUserUUID == null){  
@@ -127,7 +142,8 @@ public class NightAction{
         return message;
     }
 
-    public List<UUID> finishNightAction(){  //犠牲者処理
+    //犠牲者処理
+    public List<UUID> finishNightAction(){
         UUID maxValueUUID = null;
         Integer maxValue = 0;
         Integer i = 0;
