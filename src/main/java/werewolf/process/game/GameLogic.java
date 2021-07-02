@@ -1,7 +1,7 @@
 /**
  * ゲームのロジックを持ち、実行する
  *
- * @version 1.2
+ * @version 1.4
  * @author al19100
  */
 
@@ -11,13 +11,11 @@ import java.util.Random;
 
 import java.util.*;
 
-import werewolf.store.gamesettings.PlayersStatus;
-
-import werewolf.store.gamesettings.VotingAction;
-
 import werewolf.store.gamesettings.GameSettings;
 
-import werewolf.store.gamesettings.NightAction;
+import werewolf.store.gamesettings.RoleBreakdown;
+
+import werewolf.store.chat.Message;
 
 public class GameLogic {
 	public static void main(String[] args){
@@ -34,7 +32,6 @@ public class GameLogic {
 	 * @param playersStatus  ゲーム時のユーザの生死と役職の情報
 	 * @param votingAction 投票について
 	 * @param gameSettings ゲームの設定情報
-	 * @param nightAction 夜のアクション
 	 */
 
 	GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings) {
@@ -67,11 +64,6 @@ public class GameLogic {
 		if (firstNightSee == 0 || firstNightSee == 2) {
 			//全員-人狼-1
 			temp = playerCount - roleLimit.werewolvesNum - 1;
-			if (temp > roleLimit.werewolvesNum) {
-				return true;
-			} else {
-				return false;
-			}
 		} else {
 			//妖狐>=占いまたは妖狐<占い
 			if (roleLimit.foxSpiritsNum >= roleLimit.seersNum) {
@@ -81,11 +73,11 @@ public class GameLogic {
 				//全員-人狼-妖狐-1
 				temp = playerCount - roleLimit.werewolvesNum - roleLimit.foxSpiritsNum - 1;
 			}
-			if (temp > roleLimit.werewolvesNum) {
-				return true;
-			} else {
-				return false;
-			}
+		}
+		if (temp > roleLimit.werewolvesNum) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -93,8 +85,6 @@ public class GameLogic {
 	 * 役職わけ
 	 * @param playerCount 参加人数
 	 * @param roleLimit 各役職の上限人数
-	 * @param roles 振り分ける役職のリスト
-	 * @param temp 役職ごとの振り分け済み人数
 	 */
 
 	public void distributeRole(int playerCount, RoleBreakdown roleLimit) {
@@ -139,7 +129,7 @@ public class GameLogic {
 				} else if (num == 8 && roleLimit.madmenNum != temp[8]) {
 					roles.add("madmen");
 					temp[8]++;
-				} else if (num == 9 && roleLimit.traitorsNum !=  temp[9]) {
+				} else if (num == 9 && roleLimit.traitorsMum !=  temp[9]) {
 					roles.add("traitor");
 					temp[9]++;
 				} else if (num == 10 && roleLimit.foxSpiritsNum != temp[10]) {
@@ -192,8 +182,6 @@ public class GameLogic {
 	 * @param userUUID 夜のアクションをするプレイヤー
 	 * @param targetUUID アクションの対象となるプレイヤー
 	 * @param votingPriority 人狼の投票優先度
-	 * @param role アクションをするプレイヤーの役職
-	 * @param votingResult necromancerの対象となるプレイヤーのUUID
 	 * @return 夜のアクションの対象のUUIDとアクションの結果もしくはエラー
 	 */
 
@@ -208,17 +196,17 @@ public class GameLogic {
 		if (role.equals("seer")) {
 			message = nightAction.seerAction(userUUID, targetUUID);
 		} else if (role.equals("necromancer")) {
-			votingResult = nightAction.getVotingResult();
+			votingResult = votingAction.getVotingResult();
 			if (votingResult != null) {
-				message = nightAction.necromancersAction(userUUID, votingResult);
+				message = nightAction.necromancerAction(userUUID, votingResult);
 			} else {
 				message.userUUID = null;
 				message.text = "霊視の対象がいませんでした";
 			}
 		} else if (role.equals("knight") || role.equals("blackKnight")) {
 			message = nightAction.guardAction(userUUID, targetUUID);
-		}  else if (role.equals("werewolve")) {
-			message = nightAction.werewolvAction(userUUID, targetUUID, votingPriority);
+		}  else if (role.equals("werewolf")) {
+			message = nightAction.werewolfAction(userUUID, targetUUID, votingPriority);
 		}  else if (role.equals("phantomThief")) {
 			message = nightAction.phantomThiefAction(userUUID, targetUUID);
 		}
@@ -237,9 +225,9 @@ public class GameLogic {
 	 * 勝利条件を満たしているプレイヤーがいるかチェック
 	 * @return 以下記述
 	 * 	0:勝利条件を満たした陣営無し
-		1:村人陣営が勝利条件を満たした
-		2:人狼陣営が勝利条件を満たした
-		3:妖狐陣営が勝利条件を満たした
+	1:村人陣営が勝利条件を満たした
+	2:人狼陣営が勝利条件を満たした
+	3:妖狐陣営が勝利条件を満たした
 	 */
 	public int existWinner() {
 		int villagers, werewolves, foxSpirits;
