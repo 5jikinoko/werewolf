@@ -9,16 +9,18 @@ package werewolf.process.game;
 
 import java.util.*;
 
+import werewolf.store.chat.Message;
+
 public class NightAction{
     /**
-    *役職ごとの夜のアクションを遂行する
-    *@param playersStatus プレイヤーの生死状況、役職
-    *@param tonightVictim 今夜の犠牲者のリスト
-    *@param killNominee 人狼襲撃候補者
-    *@param guardTarget 騎士の守り先
-    *@param lastNightGuardTarget 昨夜の騎士の守り先
-    *@param continuousGuard 連続ガードの有無
-    */
+     *役職ごとの夜のアクションを遂行する
+     * playersStatus プレイヤーの生死状況、役職
+     * tonightVictim 今夜の犠牲者のリスト
+     * killNominee 人狼襲撃候補者
+     * guardTarget 騎士の守り先
+     * lastNightGuardTarget 昨夜の騎士の守り先
+     * continuousGuard 連続ガードの有無
+     */
     PlayersStatus playersStatus;
     List<UUID> tonightVictim;
     Map<UUID,Integer> killNominee;
@@ -33,7 +35,7 @@ public class NightAction{
         tonightVictim = new ArrayList<UUID>();
         killNominee = new HashMap<UUID,Integer>();
         guardTarget = new HashMap<UUID,UUID>();
-        lastNightGuardTarget  = new HashMap<UUID,UUID>(); 
+        lastNightGuardTarget  = new HashMap<UUID,UUID>();
     }
 
     //占い師行動処理
@@ -71,13 +73,13 @@ public class NightAction{
 
     //騎士行動処理
     public Message guardAction(UUID userUUID,UUID targetUserUUID){
-        Messaage message = new Message();
+        Message message = new Message();
         message.text = "護衛した";
         if(targetUserUUID == null && !continuousGuard){
             List<UUID> guardList = new ArrayList<UUID>();
-            guardList = playersStatus.getDeadPlayerUUIDs(); 
+            guardList = playersStatus.getDeadPlayerUUIDs();
             for (Map.Entry<UUID,UUID>   entry : lastNightGuardTarget.entrySet()){
-            guardList.add(entry.getKey());
+                guardList.add(entry.getKey());
             }
             targetUserUUID = playersStatus.getRandomUser(guardList);
         }
@@ -90,7 +92,7 @@ public class NightAction{
             message.text ="連続ガードはできません";
             return message;
         }
-        guardTarget.put(targetUserUUID,userUUID); 
+        guardTarget.put(targetUserUUID,userUUID);
 
         return message;
     }
@@ -100,7 +102,7 @@ public class NightAction{
         List<UUID> werewolfList = new ArrayList<UUID>();
         Message message = new Message();
         message.text = "襲撃を試みた";
-        
+
         if(playersStatus.getWerewolfPlayerUUIDs().contains(targetUserUUID)){
             message.text = "エラー:人狼を襲撃できない";
             return message;
@@ -117,7 +119,7 @@ public class NightAction{
         }
         if(killNominee.containsKey(targetUserUUID)){
             killNominee.put(targetUserUUID,killNominee.get(targetUserUUID) + priority);
-        }   else    {    
+        }   else    {
             killNominee.put(targetUserUUID,priority);
         }
         return message;
@@ -125,9 +127,9 @@ public class NightAction{
 
     //怪盗行動処理
     public Message phantomThiefAction(UUID userUUID,UUID targetUserUUID){
-        Messsage message = new Message();
+        Message message = new Message();
 
-        if(targetUserUUID == null){  
+        if(targetUserUUID == null){
             List<UUID> userUUID_ = new ArrayList<UUID>();
             userUUID_.add(userUUID);
             targetUserUUID = playersStatus.getRandomUser(userUUID_);
@@ -147,7 +149,7 @@ public class NightAction{
         UUID maxValueUUID = null;
         Integer maxValue = 0;
         Integer i = 0;
-        List<UUID> result = new ArrayList<UUID>();
+        List<UUID> result;
 
         for (Map.Entry<UUID, Integer> temp : killNominee.entrySet()) {
             if(temp.getValue() > maxValue){
@@ -158,9 +160,9 @@ public class NightAction{
         if(!guardTarget.containsValue(maxValueUUID)){
             tonightVictim.add(maxValueUUID);
         }
-            for(i = 0;i < tonightVictim.size();i++){
-                playersStatus.kill(tonightVictim.get(i));
-            }
+        for(i = 0;i < tonightVictim.size();i++){
+            playersStatus.kill(tonightVictim.get(i));
+        }
         lastNightGuardTarget = guardTarget;
         guardTarget = new HashMap<UUID,UUID>();
         killNominee = new HashMap<UUID,Integer>();
@@ -170,4 +172,3 @@ public class NightAction{
         return result;
     }
 }
-
