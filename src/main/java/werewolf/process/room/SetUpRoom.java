@@ -1,7 +1,7 @@
 /**
  * 部屋の作成と部屋の設定する
  *
- * @version 1.0
+ * @version 1.1
  * @author
  */
 
@@ -9,6 +9,7 @@ package werewolf.process.room;
 
 import io.javalin.http.Context;
 import werewolf.store.room.*;
+import werewolf.store.chat.ChatStore;
 
 import java.util.UUID;
 
@@ -75,6 +76,8 @@ public class SetUpRoom {
 
         //部屋の設定とともに新しい部屋を作成
         int roomID = RoomInfo.createRoom(roomSettings);
+        //チャットの設定
+        ChatStore.createRoomChat(roomID);
         System.out.println(hostUUID + "が部屋ID" + roomID + "で部屋を作成");
         return 200;
     }
