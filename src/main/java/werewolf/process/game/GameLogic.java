@@ -120,9 +120,10 @@ public class GameLogic {
 				} else if (num == 5 && roleLimit.blackKnightsNum != temp[5]) {
 					roles.add("blackKnight");
 					temp[5]++;
-				} else if (num == 6 && roleLimit.freemasonariesNum != temp[6]) {
+				} else if (num == 6 && roleLimit.freemasonariesNum != temp[6] && i != playerCount - 1) {
 					roles.add("freemasonary");
-					temp[6]++;
+					temp[6] = temp[6] + 2;
+					i++;
 				} else if (num == 7 && roleLimit.bakersNum != temp[7]) {
 					roles.add("baker");
 					temp[7]++;
