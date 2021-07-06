@@ -100,7 +100,7 @@ public class GameLogic {
 			}
 
 			// 人狼以外を振り分け
-			for (int i = 0; i < playerCount; i++) {
+			for (int i = 0; i < playerCount - roleLimit.werewolvesNum; i++) {
 				int num = rand.nextInt(13);
 				if (num == 0 && roleLimit.villagersNum != temp[0]) {
 					roles.add("villager");
@@ -120,10 +120,11 @@ public class GameLogic {
 				} else if (num == 5 && roleLimit.blackKnightsNum != temp[5]) {
 					roles.add("blackKnight");
 					temp[5]++;
-				} else if (num == 6 && roleLimit.freemasonariesNum != temp[6]) {
+				} else if (num == 6 && roleLimit.freemasonariesNum != temp[6] && i != playerCount - 1) { // 追記
 					roles.add("freemasonary");
-					temp[6]++;
-				} else if (num == 7 && roleLimit.bakersNum != temp[7]) {
+					temp[6] = temp[6] + 2;
+					i++;
+				 else if (num == 7 && roleLimit.bakersNum != temp[7]) {
 					roles.add("baker");
 					temp[7]++;
 				} else if (num == 8 && roleLimit.madmenNum != temp[8]) {
