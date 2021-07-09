@@ -1,7 +1,7 @@
 /**
 *プロフィール登録をする
 *
-* @version 1.0
+* @version 2.0
 * @author
 */
 
@@ -63,13 +63,10 @@ public class ProfileRegister {
 
         //roomIDが指す部屋のユーザとプロフィール被りが無いか確認
         int checkResult;
-        if (roomID != 0) {
-            checkResult = checkDuplicates(userUUID, roomID, userName, icon);
-        } else {
-            checkResult = 1;
-        }
+        checkResult = checkDuplicates(userUUID, roomID, userName, icon);
+        System.out.println("checkResult=" + checkResult);
         //被りかエラーが有り
-        if (checkResult != 1) {
+        if (checkResult != 0) {
             statusCode = 400;
 
             if (checkResult <= -4) {
@@ -96,7 +93,7 @@ public class ProfileRegister {
             UserProfile.register(userUUID, userName, icon);
             return statusCode;
         }
-
+        System.out.println(statusCode + 10*nameCode + iconCode);
         return statusCode + 10*nameCode + iconCode;
     }
 
@@ -108,7 +105,7 @@ public class ProfileRegister {
      * @param userName
      * @param icon
      * @return
-     * 1：被り無し
+     * 0：被り無し
      * -1：ユーザネームの被りあり
      * -2：アイコンの被りあり
      * -3：ユーザネームとアイコンに被りあり
@@ -143,7 +140,7 @@ public class ProfileRegister {
                 return -5;
             }
 
-            if (nameDuplicates != -1 && nameAndIcon.name == userName) {
+            if (nameDuplicates != -1 && nameAndIcon.name.equals(userName)) {
                 nameDuplicates = -1;
             }
             if (iconDuplicates != -2 && nameAndIcon.icon == icon) {
