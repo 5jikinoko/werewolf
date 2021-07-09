@@ -1,13 +1,15 @@
 /**
 * 部屋の情報を管理する
 *
-* @version 1.0
+* @version 2.0
 * @author
 */
 
 package werewolf.store.room;
 
 import java.util.*;
+
+import werewolf.process.profile.ProfileGetter;
 import werewolf.store.user.*;
 
 public class RoomInfo {
@@ -34,7 +36,7 @@ public class RoomInfo {
         }
 
         //パスワード認証
-        if (roomSettings.pass == "null" || roomSettings.pass == pass) {
+        if (roomSettings.pass == null || roomSettings.pass.equals("") || roomSettings.pass.equals(pass)) {
             return 1;
         } else {
             return -1;
@@ -116,13 +118,13 @@ public class RoomInfo {
      */
     public static int createRoom(RoomSettings roomSettings) {
 
-        //ToTo　部屋の数を1000までにする処理
+        //ToDo　部屋の数を1000までにする処理
 
         int roomID = nextRoomID;
         ++nextRoomID;
         UUID hostUUID = roomSettings.hostUUID;
 
-
+        System.out.println(ProfileGetter.getProfile(hostUUID).name + "がroomID=" + roomID + " あいことば[" + roomSettings.pass + "]で部屋を作りました");
         Set<UUID> userSet = new HashSet<UUID>();
         userSet.add(hostUUID);
         roomIDtoUserUUIDSet.put(roomID, userSet);
@@ -141,10 +143,11 @@ public class RoomInfo {
      */
     public static int whereRoom(UUID userUUID) {
         Integer roomID = userUUIDtoRoomID.get(userUUID);
+        System.out.println("whereRoom:" + userUUID.toString() + "はroomID=" + roomID + "にいます");
         if(roomID == null) {
             return 0;
         }
-        return roomID.intValue();
+        return roomID;
     }
 
     /**
@@ -201,7 +204,7 @@ public class RoomInfo {
         Set memberSet = getParticipantsSet(roomInfo.roomID);
         roomInfo.nowMember = memberSet.size();
         //パススワードの有無を格納
-        if (rs.pass == "") {
+        if (rs.pass == null || rs.pass.equals("")) {
             //パスワードが無い
             roomInfo.existPass = false;
         } else {
@@ -229,6 +232,7 @@ public class RoomInfo {
             //リストに格納
             result.add(roomInfo);
         }
+        System.out.println(result);
         return result;
     }
 
