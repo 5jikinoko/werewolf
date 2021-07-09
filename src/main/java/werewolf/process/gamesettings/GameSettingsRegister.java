@@ -14,13 +14,21 @@ public class GameSettingsRegister {
      * @return ステータスコード
      * 200:成功
      * 496:範囲外の値
-     * 497:部屋主でない
+     * 495:部屋主でない
+     * 497:UUIDが存在しない
      * 498:部屋が存在しない
      * 499:入力が不正
      */
     public static int register(Context ctx) {
         //リクエストを送ったユーザのUUIDを取得
-        UUID userUUID = UUID.fromString(ctx.cookie("UUID"));
+        String stringUUID = ctx.cookie("UUID");
+        //Todo debug用　消す
+        //stringUUID = "46453234-dd1f-4ecc-abb7-ecfca363689f";
+        //ここまで
+        if (stringUUID == null) {
+            return 497;
+        }
+        UUID userUUID = UUID.fromString(stringUUID);
 
         //参加してる部屋を取得
         int roomID = RoomInfo.whereRoom(userUUID);
@@ -31,8 +39,11 @@ public class GameSettingsRegister {
             return 498;
         }
         //リクエストを送ったユーザが部屋主かチェック
-        if (userUUID != roomSettings.hostUUID) {
-            return 497;
+        if (!userUUID.equals(roomSettings.hostUUID)) {
+            System.out.println("部屋主以外がゲーム設定");
+            System.out.println(userUUID.toString());
+            System.out.println(roomSettings.hostUUID.toString());
+            return 495;
         }
 
         //入力された値を取得してnullでないかチェック
@@ -146,7 +157,7 @@ public class GameSettingsRegister {
             return 499;
         }
 
-        Integer traitorsMum = Integer.valueOf(ctx.formParam("traitorsMum"));
+        Integer traitorsMum = Integer.valueOf(ctx.formParam("traitorsNum"));
         if (traitorsMum == null) {
             System.out.println("traitorsMum is null");
             return 499;
@@ -172,14 +183,34 @@ public class GameSettingsRegister {
         //読み取り終わり
 
         //値の範囲チェック
-        /*ToDo
-        if ( !(30 <= discussionTime && discussionTime <= 300)) {
+        if ( !(60 <= discussionTime && discussionTime <= 600)) {
             return 496;
         }
 
-        if( !(30 <= votingTime))
+        if ( !(30 <= votingTime && votingTime <= 120)) {
+            return 496;
+        }
 
-         */
+        if ( !(30 <= nightTime && nightTime <= 120)) {
+            return 496;
+        }
+
+        if ( !(0 <= willTime && willTime <= 120)) {
+            return 496;
+        }
+
+        if ( !(tieVoteOption == 0 || tieVoteOption == 1)) {
+            return 496;
+        }
+
+        if ( !(werewolfChatSwitch == 0 || werewolfChatSwitch == 1 || werewolfChatSwitch == 2)) {
+            return 496;
+        }
+
+        if ( !(firstNightSee == 0 || firstNightSee == 1 || firstNightSee == 2)) {
+            return 496;
+        }
+
         //値の範囲チェック終わり
 
         //登録
