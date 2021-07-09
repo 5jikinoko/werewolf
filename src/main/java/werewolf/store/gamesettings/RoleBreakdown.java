@@ -65,7 +65,7 @@ public class RoleBreakdown {
         this.phantomThievesNum = phantomThievesNum;
     }
 
-        public RoleBreakdown () {
-        
+    public RoleBreakdown () {
+
     }
 }
