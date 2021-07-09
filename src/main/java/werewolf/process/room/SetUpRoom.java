@@ -1,7 +1,7 @@
 /**
  * 部屋の作成と部屋の設定する
  *
- * @version 1.1
+ * @version 2.0
  * @author
  */
 
@@ -33,29 +33,24 @@ public class SetUpRoom {
         UUID hostUUID = UUID.fromString(stringUUID);
 
         //部屋の名前を取得
-        String roomName = ctx.formParam("roomName");
-        if (roomName == null) {
+        String roomName = ctx.formParam("roomName", "");
+        if (roomName == "") {
             return 499;
         } else if (roomName.length() > 10) {
             //文字数制限を超えた
-            //ToDo 字数制限決定
             return 496;
         }
 
         //パスワードを取得
-        String pass = ctx.formParam("pass");
-        if (pass == null) {
-            return 499;
-        } else if (pass.length() > 15) {
+        String pass = ctx.formParam("pass", "");
+        if (pass.length() > 15) {
             //字数制限を超えた
             return 496;
-        } else if (pass == "") {
-            System.out.println("パスワード無しの部屋");
         }
 
         //人数制限を取得
-        Integer maxMember = Integer.valueOf(ctx.formParam("maxMember"));
-        if (maxMember == null) {
+        int maxMember = Integer.valueOf(ctx.formParam("maxMember", "0"));
+        if (maxMember == 0) {
             return 499;
         } else if ( maxMember <= 3 || 20 < maxMember) {
             return 496;
@@ -66,7 +61,6 @@ public class SetUpRoom {
         if (introduction == null) {
             return 499;
         } else if (introduction.length() > 500) {
-            //ToDo 文字数制限を決める
             return 496;
         }
 
@@ -76,9 +70,12 @@ public class SetUpRoom {
 
         //部屋の設定とともに新しい部屋を作成
         int roomID = RoomInfo.createRoom(roomSettings);
+        //cookieに登録
+        ctx.cookie("roomID", String.valueOf(roomID));
         //チャットの設定
         ChatStore.createRoomChat(roomID);
         System.out.println(hostUUID + "が部屋ID" + roomID + "で部屋を作成");
+        System.out.println("roomName:" + roomName + "   pass:" + pass + "   max:" + maxMember + "   紹介文:" + introduction);
         return 200;
     }
 }
