@@ -8,13 +8,13 @@
 package werewolf.store.room;
 
 public class RoomInfoForSending {
-    int roomID;
-    String hostName;
-    String roomName;
-    int maxMember;
-    int nowMember;
-    boolean existPass;
-    String introduction;
+    public int roomID;
+    public String hostName;
+    public String roomName;
+    public int maxMember;
+    public int nowMember;
+    public boolean existPass;
+    public String introduction;
 
     public RoomInfoForSending(
             int roomID,
