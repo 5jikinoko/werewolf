@@ -1,7 +1,7 @@
 /**
  * ゲームのロジックを持ち、実行する
  *
- * @version 1.4
+ * @version 2.0
  * @author al19100
  */
 
@@ -36,7 +36,6 @@ public class GameLogic {
 
 	GameLogic(PlayersStatus playersStatus, VotingAction votingAction, GameSettings gameSettings) {
 		this.playersStatus = playersStatus;
-
 		this.gameSettings = gameSettings;
 
 		this.votingAction = votingAction;
@@ -47,38 +46,24 @@ public class GameLogic {
 	/**
 	 * 2日目朝に勝敗が決まる可能性があるかチェック
 	 * @param playerCount 参加人数
-	 * @param firstNightSee 初日占いの設定
 	 * @param roleLimit 各役職の上限人数
 	 * @return 2日目朝に勝敗が決まるor共有者の数が不適切ならfalse, そうでなければtrue
 	 */
 
-	public static boolean checkRoleSetting(int playerCount, int firstNightSee, RoleBreakdown roleLimit) {
-		int temp;
-
+	public static boolean checkRoleSetting(int playerCount, RoleBreakdown roleLimit) {
 		//共有者の数が0,2以外でないかチェック
 		if (roleLimit.freemasonariesNum != 0 && roleLimit.freemasonariesNum != 2) {
 			return false;
 		}
-
-		//初日占いあり/なしでの分岐
-		if (firstNightSee == 0 || firstNightSee == 2) {
-			//全員-人狼-1
-			temp = playerCount - roleLimit.werewolvesNum - 1;
-		} else {
-			//妖狐>=占いまたは妖狐<占い
-			if (roleLimit.foxSpiritsNum >= roleLimit.seersNum) {
-				//全員-人狼-占い-1
-				temp = playerCount - roleLimit.werewolvesNum - roleLimit.seersNum - 1;
-			} else {
-				//全員-人狼-妖狐-1
-				temp = playerCount - roleLimit.werewolvesNum - roleLimit.foxSpiritsNum - 1;
-			}
+		//人間の数を取得
+		int humanCount = playerCount - (roleLimit.werewolvesNum + roleLimit.foxSpiritsNum + roleLimit.foolsNum);
+		//怪盗がいた場合、怪盗が人狼がまたは背信者を盗む対象としたとき初日夜に人間が一人死亡するので
+		//条件を満たすのに必要な人間の数が増える
+		if (roleLimit.phantomThievesNum != 0) {
+			humanCount -= 1;
 		}
-		if (temp > roleLimit.werewolvesNum) {
-			return true;
-		} else {
-			return false;
-		}
+		//初日朝の時点で人狼の勝利条件を満たさないならtrue
+		return humanCount > roleLimit.werewolvesNum;
 	}
 
 	/**
@@ -88,94 +73,82 @@ public class GameLogic {
 	 */
 
 	public void distributeRole(int playerCount, RoleBreakdown roleLimit) {
+		System.out.println("参加者数(playerCount):" + playerCount + "役職の制限人数(roleLimit): 村人:" + roleLimit.villagersNum + " 占い師:" + roleLimit.seersNum
+				+ " 霊媒師:" + roleLimit.necromancersNum + " 騎士:" + roleLimit.knightsNum
+				+ " ハンター:" + roleLimit.huntersNum + " 黒騎士:" + roleLimit.blackKnightsNum
+				+ " 共有者:" + roleLimit.freemasonariesNum + " パン屋:" + roleLimit.bakersNum
+				+ " 人狼:" + roleLimit.werewolvesNum + " 狂人:" + roleLimit.madmenNum
+				+ " 背信者:" + roleLimit.traitorsMum + " 妖狐:" + roleLimit.foxSpiritsNum
+				+ " 吊人:" + roleLimit.foolsNum + " 怪盗:" + roleLimit.phantomThievesNum);
+
 		List<String> roles = new ArrayList<>();
-		int[] temp = new int[13];
-		int [] werewolfSelect = new int[roleLimit.werewolvesNum];
-		Random rand = new Random();
-		int firstNightSee = gameSettings.firstNightSee;
-
-		while(true){
-			for (int i = 0; i < 13; i++) {
-				temp[i] = 0;
-			}
-
-			// 人狼以外を振り分け
-			for (int i = 0; i < playerCount - roleLimit.werewolvesNum; i++) {
-				int num = rand.nextInt(13);
-				if (num == 0 && roleLimit.villagersNum != temp[0]) {
-					roles.add("villager");
-					temp[0]++;
-				} else if (num == 1 && roleLimit.seersNum != temp[1]) {
-					roles.add("seer");
-					temp[1]++;
-				} else if (num == 2 && roleLimit.necromancersNum != temp[2]) {
-					roles.add("necromancer");
-					temp[2]++;
-				} else if (num == 3 && roleLimit.knightsNum != temp[3]) {
-					roles.add("knight");
-					temp[3]++;
-				} else if (num == 4 && roleLimit.huntersNum != temp[4]) {
-					roles.add("hunter");
-					temp[4]++;
-				} else if (num == 5 && roleLimit.blackKnightsNum != temp[5]) {
-					roles.add("blackKnight");
-					temp[5]++;
-				} else if (num == 6 && roleLimit.freemasonariesNum != temp[6] && i != playerCount - roleLimit.werewolvesNum - 1) {
-					roles.add("freemasonary");
-					temp[6] = temp[6] + 2;
-					i++;
-				 else if (num == 7 && roleLimit.bakersNum != temp[7]) {
-					roles.add("baker");
-					temp[7]++;
-				} else if (num == 8 && roleLimit.madmenNum != temp[8]) {
-					roles.add("madmen");
-					temp[8]++;
-				} else if (num == 9 && roleLimit.traitorsMum !=  temp[9]) {
-					roles.add("traitor");
-					temp[9]++;
-				} else if (num == 10 && roleLimit.foxSpiritsNum != temp[10]) {
-					roles.add("foxSpirit");
-					temp[10]++;
-				} else if (num == 11 && roleLimit.foolsNum != temp[11]) {
-					roles.add("fool");
-					temp[11]++;
-				} else if (num == 12 && roleLimit.phantomThievesNum != temp[12]) {
-					roles.add("phantomThieve");
-					temp[12]++;
-				} else {
-					// 既に上限人数に達していた場合
-					i--;
-				}
-			}
-
-			// 人狼を何番目に入れるか決める
-			for (int i = 0; i < roleLimit.werewolvesNum; i++) {
-				int num = rand.nextInt(playerCount - roleLimit.werewolvesNum);
-				for (int j = 0; j < roleLimit.werewolvesNum; j++) {
-					if (num == werewolfSelect[j]) {
-						// 既に同一numが存在していたとき
-						// numの再振り分け
-						i--;
-						break;
-					} else if (j == roleLimit.werewolvesNum - 1) {
-						// 最後までforを回し、同一numが存在していなかったとき
-						werewolfSelect[i] = num;
-					}
-				}
-			}
-
-			// werewolfSelect[i]番目をwerewolveに書き換え
-			for (int i = 0; i < roleLimit.werewolvesNum; i++){
-				roles.set(werewolfSelect[i], "werewolve");
-			}
-
-			// 振り分けに問題がないかチェック
-			if (GameLogic.checkRoleSetting(playerCount, firstNightSee, roleLimit) == true) {
-				playersStatus.setRoles(roles);
-				break;
-			}
-			// 問題があれば再振り分け
+		//リストに人狼以外全ての役職を上限まで入れる
+		for (int i = 0; i< roleLimit.villagersNum; ++i) {
+			roles.add("villager");
 		}
+		for (int i = 0; i< roleLimit.seersNum; ++i) {
+			roles.add("seer");
+		}
+		for (int i = 0; i< roleLimit.necromancersNum; ++i) {
+			roles.add("necromancer");
+		}
+		for (int i = 0; i< roleLimit.knightsNum; ++i) {
+			roles.add("knight");
+		}
+		for (int i = 0; i< roleLimit.huntersNum; ++i) {
+			roles.add("hunter");
+		}
+		for (int i = 0; i< roleLimit.blackKnightsNum; ++i) {
+			roles.add("blackKnight");
+		}
+		for (int i = 0; i< roleLimit.freemasonariesNum; ++i) {
+			roles.add("freemasonary");
+			//共有者はいるなら一人だけ入れる
+			++i;
+		}
+		for (int i = 0; i< roleLimit.bakersNum; ++i) {
+			roles.add("baker");
+		}
+		for (int i = 0; i< roleLimit.madmenNum; ++i) {
+			roles.add("madman");
+		}
+		for (int i = 0; i< roleLimit.traitorsMum; ++i) {
+			roles.add("traitor");
+		}
+		for (int i = 0; i< roleLimit.foxSpiritsNum; ++i) {
+			roles.add("foxSpirit");
+		}
+		for (int i = 0; i< roleLimit.foolsNum; ++i) {
+			roles.add("fool");
+		}
+		for (int i = 0; i< roleLimit.phantomThievesNum; ++i) {
+			roles.add("phantomThief");
+		}
+		//シャッフル
+		Collections.shuffle(roles);
+		//リストの先頭から（参加人数-人狼の数）番目までを切り出す
+		List<String> result = roles.subList(0, playerCount - roleLimit.werewolvesNum);
+		//選ばれた役職に共有者が含まれているなら共有者を一人追加
+		if (result.contains("freemasonary")) {
+			//先頭が共有者なら配列の2番目を共有者にそうでないなら先頭を共有者に
+			if (result.get(0).equals("freemasonary")) {
+				result.set(1, "freemasonary");
+			} else {
+				result.set(0, "freemasonary");
+			}
+		}
+		//人狼の数だけ人狼の役職をリストに追加
+		for (int i = 0; i < roleLimit.werewolvesNum; ++i) {
+			result.add("werewolf");
+		}
+		//シャッフル
+		Collections.shuffle(result);
+
+		System.out.println("振り分け完了！");
+		for (String role : result) {
+			System.out.println(role);
+		}
+		playersStatus.setRoles(result);
 	}
 
 
@@ -199,20 +172,25 @@ public class GameLogic {
 		} else if (role.equals("necromancer")) {
 			votingResult = votingAction.getVotingResult();
 			if (votingResult != null) {
-				message = nightAction.necromancerAction(userUUID, votingResult);
+				message = nightAction.necromancerAction(votingResult);
 			} else {
-				message.userUUID = null;
+				message.userUUID = userUUID;
 				message.text = "霊視の対象がいませんでした";
 			}
-		} else if (role.equals("knight") || role.equals("blackKnight")) {
+		} else if (role.equals("knight") || role.equals("blackKnight") || role.equals("hunter")) {
 			message = nightAction.guardAction(userUUID, targetUUID);
 		}  else if (role.equals("werewolf")) {
 			message = nightAction.werewolfAction(userUUID, targetUUID, votingPriority);
 		}  else if (role.equals("phantomThief")) {
 			message = nightAction.phantomThiefAction(userUUID, targetUUID);
+			System.out.println("怪盗が夜のアクションを実行");
 		}
 
 		return message;
+	}
+
+	public List<UUID> finishFirstNightAction() {
+		return  nightAction.finishFirstNightAction();
 	}
 
 	/**
@@ -226,31 +204,35 @@ public class GameLogic {
 	 * 勝利条件を満たしているプレイヤーがいるかチェック
 	 * @return 以下記述
 	 * 	0:勝利条件を満たした陣営無し
-	1:村人陣営が勝利条件を満たした
-	2:人狼陣営が勝利条件を満たした
-	3:妖狐陣営が勝利条件を満たした
+		1:村人陣営が勝利条件を満たした
+		2:人狼陣営が勝利条件を満たした
+		3:妖狐陣営が勝利条件を満たした
+	 	4:吊人陣営が勝利条件を満たした
 	 */
 	public int existWinner() {
+		//投票で処刑されたのが吊人だったら吊人陣営の勝利
+		UUID executedPlayer = votingAction.getVotingResult();
+		if (executedPlayer != null && playersStatus.getRole(executedPlayer).equals("fool")) {
+			return 4;
+		}
 		int villagers, werewolves, foxSpirits;
 
 		// 陣営ごとの生存人数
-		villagers = playersStatus.survivingVillagersTeamSize();
-		werewolves = playersStatus.survivingWerewolvesTeamSize();
-		foxSpirits = playersStatus.survivingFoxSpiritsTeamSize();
-
-		if (villagers == werewolves) {
-			if (foxSpirits != 0) {
-				return 3;
-			}
-			return 1;
-		} else if (werewolves == 0) {
+		villagers = playersStatus.survivingHumanSize();
+		werewolves = playersStatus.survivingWerewolvesSize();
+		foxSpirits = playersStatus.survivingFoxSpiritsSize();
+		if (villagers <= werewolves) {
 			if (foxSpirits != 0) {
 				return 3;
 			}
 			return 2;
+		} else if (werewolves == 0) {
+			if (foxSpirits != 0) {
+				return 3;
+			}
+			return 1;
 		} else {
 			return 0;
 		}
 	}
 }
-
