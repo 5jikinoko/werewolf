@@ -22,15 +22,22 @@ public class VotingAction {
 
     //ゲームに参加するプレイヤー毎のUUIDと対応する役職と生死の状態を持たせる。
     VotingAction (PlayersStatus playersStatus) {
-	this.playersStatus = playersStatus;
+        this.playersStatus = playersStatus;
     }
 
     //投票者と投票者の投票先の情報を追加する。
     void vote ( UUID userUUID, UUID targetUserUUID) {
-	votesData.put( userUUID,targetUserUUID);
+        votesData.put( userUUID,targetUserUUID);
     }
 
-    //投票結果を確定させる。同数なものがあったら変数を代入して返す
+    Map<UUID, UUID> getVotesData() {
+        return votesData;
+    }
+
+    /**
+     * 投票結果を確定させる。同数なものがあったら変数を代入して返す
+     * @return true:処刑者が確定 false:最多得票数が同数で決まらず
+     */
     boolean finishVote () {
 
         //前回の投票結果を消して初期化
@@ -41,10 +48,10 @@ public class VotingAction {
         //votedCountにkeyが得票者、valueが得票数とすることで投票の結果を集計する
         for (Map.Entry<UUID, UUID> entry : votesData.entrySet()) {
             if ( votedCount.get( entry.getValue()) == null){
-		votedCount.put( entry.getValue(), 1);
+                votedCount.put( entry.getValue(), 1);
             } else {
-		votedCount.replace( entry.getValue(), 
-				    votedCount.get(entry.getValue()) + 1);
+                votedCount.replace( entry.getValue(),
+                        votedCount.get(entry.getValue()) + 1);
             }
         }
 
@@ -61,7 +68,7 @@ public class VotingAction {
                 //得票数がmaxのプレイヤーがもう一人いた
                 firstPlaceCount += 1;
             }
-        } 
+        }
         if ( firstPlaceCount == 1) {
 
             //投票の結果単独1位ならVotingResult（処刑対象）が確定
@@ -77,7 +84,7 @@ public class VotingAction {
 
     //投票されたプレイヤーを返す。複数いたらnullを返す。
     UUID getVotingResult() {
-	return votingResult;
+        return votingResult;
     }
 
     //投票されたプレイヤーが複数の時ランダムに一人選ぶ。
@@ -86,6 +93,9 @@ public class VotingAction {
         //同率1位が1人だけなら既に結果が決まっているのでその結果を返す
         if ( firstPlaceCount == 1) {
             return votingResult;
+        } //誰も投票しなかったらfifirstPlaceCount == 0となりRandom.nextIntが失敗する
+        else if (firstPlaceCount == 0) {
+            firstPlaceCount = 1;
         }
 
         //0以上同率1位の人の数未満のランダムな整数
@@ -109,6 +119,6 @@ public class VotingAction {
         return null;
     }
     void startNewVoting() {
-	this.votesData = new HashMap <UUID,UUID>();
+        this.votesData = new HashMap <UUID,UUID>();
     }
 }
