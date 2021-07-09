@@ -1,7 +1,7 @@
 /**
  * クラス概要:ゲーム時のユーザの生死と役職の情報を持つ
  *
- * @version 1.1
+ * @version 2.0
  * @author al19067
  */
 
@@ -19,14 +19,18 @@ import werewolf.store.gamesettings.RoleBreakdown;
 class PlayersStatus{
     private Map<UUID,PlayerStatus> statusMap = new HashMap<UUID,PlayerStatus>();
 
-    void setPlayers(List<UUID> userUUIDs) {
+    PlayerStatus getPlayerStatus(UUID userUUID) {
+        return statusMap.get(userUUID);
+    }
+
+    void setPlayers(Set<UUID> userUUIDs) {
         /*
          * メソッドの機能概要：Mapに引数で受け取ったUUIDをkeyにしてエントリーを追加していく。
          *                  valueはPlayerStatusのインスタンスを生成して入れる。
          */
-        for (int i=0;i<userUUIDs.size();i++)  {
+        for (UUID userUUID : userUUIDs) {
             PlayerStatus PS = new PlayerStatus();
-            statusMap.put(userUUIDs.get(i),PS);
+            statusMap.put(userUUID, PS);
         }
     }
 
@@ -38,10 +42,9 @@ class PlayersStatus{
          */
         int i = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            PlayerStatus PS = new PlayerStatus();
+            PlayerStatus PS = entry.getValue();
             PS.role = roles.get(i);
             PS.alive = true;
-            entry.setValue(PS);
             i++;
         }
     }
@@ -49,12 +52,13 @@ class PlayersStatus{
     String getRole(UUID userUUID) {
         //メソッドの機能概要：ユーザUUIDが指すプレイヤーの役職を返す。
         //エラー処理：UUIDが存在しないなら戻り値roleは"error"
-        for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if(entry.getKey() == userUUID) {
-                return entry.getValue().role;
-            }
+        PlayerStatus PS = statusMap.get(userUUID);
+        if (PS == null){
+            System.out.println("getRole:statusMapに" + userUUID.toString() + "がぞんざいしません");
+            return "error";
+        } else {
+            return PS.role;
         }
-        return "error";
     }
 
     void changeRole(UUID userUUID,String role) {
@@ -66,12 +70,13 @@ class PlayersStatus{
         //メソッドの機能概要：ユーザUUIDが指すプレイヤーが生存しているか返す(aliveの値を返す)。
         //エラー処理：UUIDが存在しないなら戻り値はfalse
         //生存：true,死亡：false
-        for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if(entry.getKey() == userUUID) {
-                return entry.getValue().alive;
-            }
+        PlayerStatus PS = statusMap.get(userUUID);
+        if (PS == null){
+            System.out.println("statusMapに" + userUUID.toString() + "がぞんざいしません");
+            return false;
+        } else {
+            return PS.alive;
         }
-        return false;
     }
 
     /*
@@ -82,98 +87,84 @@ class PlayersStatus{
         return statusMap.size();
     }
 
-    /*
-     * numberofSurvivingVillager 生きている村人陣営の人数
+    /**
+     * 生きてる人間の数
+     * 人間は人狼・妖狐・吊人以外を指す
+     * @return
      */
-    int survivingVillagersTeamSize () {
+    int survivingHumanSize () {
         //メソッドの機能概要：生きている村人陣営の人数を返す
-        int numberofSurvivingVillager = 0;
+        int numberOfSurvivingHuman = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if (entry.getValue().role.equals("villager") || entry.getValue().role.equals("seer") ||
-                    entry.getValue().role.equals("necromancer") || entry.getValue().role.equals("knight") ||
-                    entry.getValue().role.equals("hunter") || entry.getValue().role.equals("brackKnight") ||
-                    entry.getValue().role.equals("freemasonary") || entry.getValue().role.equals("baker")) {
-
-                if(entry.getValue().alive == true) {
-                    numberofSurvivingVillager++;
-                }
+            String role = entry.getValue().role;
+            //生存している人間か判定
+            if ( entry.getValue().alive && (
+                    role.equals("villager") || role.equals("seer") || role.equals("necromancer")
+                    || role.equals("knight") || role.equals("hunter") || role.equals("blackKnight")
+                    || role.equals("freemasonary") || role.equals("baker") || role.equals("madman")
+                    || role.equals("traitor") || role.equals("phantomThief"))) {
+                numberOfSurvivingHuman++;
             }
         }
-        return numberofSurvivingVillager;
+        return numberOfSurvivingHuman;
     }
 
-    /*
-     * numberofSurvivingWerewolf 生きている人狼陣営の人数
+    /**
+     * 生きている人狼の数を返す
+     * @return
      */
-    int survivingWerewolvesTeamSize () {
-        //機能概要：生きている人狼陣営の人数を返す。
-        int numberofSurvivingWerewolf = 0;
+    int survivingWerewolvesSize () {
+        //機能概要：生きている人狼の人数を返す。
+        int numberOfSurvivingWerewolf = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if (entry.getValue().role.equals("werewolf") || entry.getValue().role.equals("madman") ||
-                    entry.getValue().role.equals("traitor")) {
-
-                if(entry.getValue().alive == true) {
-                    numberofSurvivingWerewolf++;
-                }
+            if (entry.getValue().role.equals("werewolf") && entry.getValue().alive) {
+                numberOfSurvivingWerewolf++;
             }
         }
-        return numberofSurvivingWerewolf;
+        return numberOfSurvivingWerewolf;
     }
 
-    /*
-     * numberofSurvivingFoxSpirit 生きている妖狐陣営の人数
+    /**
+     * 生きている妖狐の人数を返す
+     * @return
      */
-    int survivingFoxSpiritsTeamSize () {
+    int survivingFoxSpiritsSize () {
         //メソッドの機能概要：生きている妖狐陣営の人数を返す。
         int numberofSurvivingFoxSpirit = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if (entry.getValue().role.equals("foxSpirit")) {
-
-                if(entry.getValue().alive == true) {
-                    numberofSurvivingFoxSpirit++;
-                }
+            if (entry.getValue().role.equals("foxSpirit") && entry.getValue().alive) {
+                numberofSurvivingFoxSpirit++;
             }
         }
         return numberofSurvivingFoxSpirit;
     }
 
-    /*
-     * numberofSurvivingFool 生きている吊人陣営の人数
+    /**
+     * 生きている吊人の人数を返す
      */
-    int survivingFoolsTeamSize () {
+    int survivingFoolsSize () {
         //メソッドの機能概要：生きている吊人陣営の人数を返す。
         int numberofSurvivingFool = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if (entry.getValue().role.equals("fool") || entry.getValue().role.equals("phantomThief")) {
-
-                if(entry.getValue().alive == true) {
-                    numberofSurvivingFool++;
-                }
+            if (entry.getValue().role.equals("fool") && entry.getValue().alive) {
+                numberofSurvivingFool++;
             }
         }
         return numberofSurvivingFool;
     }
 
-    /*
-     * numberofSurvivingBaker 生きているパン屋の人数
+    /**
+     * 生存しているパン屋がいるならtrueを返す
+     * @return
      */
     boolean isSurvivingBaker () {
         //機能概要：パン屋の生き残りがいるか調べ、生き残りがいるならtrueを返す。
-        int numberofSurvivingBaker = 0;
         for (Map.Entry<UUID,PlayerStatus> entry : statusMap.entrySet())  {
-            if (entry.getValue().role.equals("baker")) {
-
-                if(entry.getValue().alive == true) {
-                    numberofSurvivingBaker++;
-                }
+            if (entry.getValue().role.equals("baker") && entry.getValue().alive) {
+                return true;
             }
         }
-        if (numberofSurvivingBaker != 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return false;
     }
 
     /*
@@ -219,7 +210,9 @@ class PlayersStatus{
         }
         UUID freemasonaryUUID = null;
         for (Map.Entry<UUID, PlayerStatus> entry :  statusMap.entrySet()) {
+            //自分自身でない　かつ　共有者
             if(entry.getKey() != userUUID && entry.getValue().role.equals("freemasonary")){
+                freemasonaryUUID = entry.getKey();
                 break;
             }
         }
@@ -274,64 +267,15 @@ class PlayersStatus{
         return chosenUUID;
     }
 
-    /*
-     * eachRoleNum それぞれの役職の人数を格納するためのRoleBreakdownクラスのインスタンス
-     */
-    RoleBreakdown getBreakdown () {
-        /*機能概要：
-         * 役職の内訳を返す。
-         * Breakdownクラスのインスタンスを生成して対応する役職に
-         * その役職のプレイヤーの合計人数(生死は問わない)を入れて返す。
-         */
-        RoleBreakdown eachRoleNum = new RoleBreakdown();
-        for(Map.Entry<UUID, PlayerStatus> entry :  statusMap.entrySet()) {
-            if(entry.getValue().role.equals("villager")) {
-                eachRoleNum.villagersNum++;
-            }
-            else if(entry.getValue().role.equals("seer")) {
-                eachRoleNum.seersNum++;
-            }
-            else if(entry.getValue().role.equals("necromancer")) {
-                eachRoleNum.necromancersNum++;
-            }
-            else if(entry.getValue().role.equals("knight")) {
-                eachRoleNum.knightsNum++;
-            }
-            else if(entry.getValue().role.equals("hunter")) {
-                eachRoleNum.huntersNum++;
-            }
-            else if(entry.getValue().role.equals("brackKnight")) {
-                eachRoleNum.blackKnightsNum++;
-            }
-            else if(entry.getValue().role.equals("freemasonary")) {
-                eachRoleNum.freemasonariesNum++;
-            }
-            else if(entry.getValue().role.equals("baker")) {
-                eachRoleNum.bakersNum++;
-            }
-            else if(entry.getValue().role.equals("werewolf")) {
-                eachRoleNum.werewolvesNum++;
-            }
-            else if(entry.getValue().role.equals("madman")) {
-                eachRoleNum.madmenNum++;
-            }
-            else if(entry.getValue().role.equals("traitor")) {
-                eachRoleNum.traitorsMum++;
-            }
-            else if(entry.getValue().role.equals("foxSpirit")) {
-                eachRoleNum.foxSpiritsNum++;
-            }
-            else if(entry.getValue().role.equals("fool")) {
-                eachRoleNum.foolsNum++;
-            }
-            else if(entry.getValue().role.equals("phantomThief")) {
-                eachRoleNum.phantomThievesNum++;
-            }
-        }
-        return eachRoleNum;
-    }
-
     void kill (UUID userUUID) {
         statusMap.get(userUUID).alive = false;
+    }
+
+    Map<UUID,PlayerStatus> getStatusMap() {
+        return statusMap;
+    }
+
+    public String getRoleInJapanese(UUID userUUID) {
+        return statusMap.get(userUUID).roleInJapanese();
     }
 }
