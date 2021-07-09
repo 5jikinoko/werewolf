@@ -1,7 +1,7 @@
 /**
  * プロフィール情報を取得する
  *
- * @version 1.0
+ * @version 2.0
  * @author
  */
 
@@ -70,6 +70,10 @@ public class ProfileGetter {
         for(int i = 1; i <= 20; ++i) {
             result.add(Integer.valueOf(i));
         }
+        //部屋が無いなら1から20のアイコンが全部使える
+        if (users == null) {
+            return result;
+        }
         //リストから参加者のアイコン画像の番号を取り除く
         for (UUID userUUID : users) {
             result.remove(Integer.valueOf( UserProfile.getNameAndIcon(userUUID).icon ));
@@ -91,5 +95,4 @@ public class ProfileGetter {
         }
         return result;
     }
-
 }
