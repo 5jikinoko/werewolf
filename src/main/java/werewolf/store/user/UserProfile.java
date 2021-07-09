@@ -12,7 +12,9 @@ public class UserProfile {
     }
 
     public static void register (UUID userUUID, String name, int icon) {
+         System.out.println(userUUID.toString() + " name:" + name + " icon:" + icon);
          userProfileMap.put(userUUID, new NameAndIcon(name, icon));
+         System.out.println("edit!!");
     }
 
     public static NameAndIcon getNameAndIcon(UUID userUUID) {
